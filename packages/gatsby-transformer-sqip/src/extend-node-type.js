@@ -6,7 +6,6 @@ const {
 } = require(`gatsby-transformer-sharp/types`)
 const { queueImageResizing } = require(`gatsby-plugin-sharp`)
 
-const Debug = require(`debug`)
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -14,11 +13,10 @@ const {
   GraphQLBoolean,
 } = require(`gatsby/graphql`)
 const sharp = require(`sharp`)
-const { exists, ensureDir, readdir } = require(`fs-extra`)
+const { exists, ensureDir } = require(`fs-extra`)
 
 const generateSqip = require(`./generate-sqip`)
 
-const debug = Debug(`gatsby-transformer-sqip`)
 const SUPPORTED_NODES = [`ImageSharp`, `ContentfulAsset`]
 
 module.exports = async args => {
