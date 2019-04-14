@@ -7,7 +7,6 @@ const {
 const { queueImageResizing } = require(`gatsby-plugin-sharp`)
 
 const Debug = require(`debug`)
-const fs = require(`fs-extra`)
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -15,7 +14,7 @@ const {
   GraphQLBoolean,
 } = require(`gatsby/graphql`)
 const sharp = require(`sharp`)
-const { ensureDir } = require(`fs-extra`)
+const { exists, ensureDir, readdir } = require(`fs-extra`)
 
 const generateSqip = require(`./generate-sqip`)
 
@@ -43,7 +42,7 @@ module.exports = async args => {
 
 async function sqipSharp({ type, cache, getNodeAndSavePathDependency, store }) {
   const program = store.getState().program
-  const cacheDir = resolve(`${program.directory}/.cache/sqip/`)
+  const cacheDir = resolve(`${program.directory}/.cache-sqip/`)
 
   await ensureDir(cacheDir)
 
@@ -110,8 +109,7 @@ async function sqipSharp({ type, cache, getNodeAndSavePathDependency, store }) {
 
         const job = await queueImageResizing({ file, args: sharpArgs })
 
-        if (!(await fs.exists(job.absolutePath))) {
-          debug(`Preparing ${file.name}`)
+        if (!(await exists(job.absolutePath))) {
           await job.finishedPromise
         }
 
@@ -138,7 +136,7 @@ async function sqipContentful({ type, cache, store }) {
   const cacheImage = require(`gatsby-source-contentful/cache-image`)
 
   const program = store.getState().program
-  const cacheDir = resolve(`${program.directory}/.cache/sqip/`)
+  const cacheDir = resolve(`${program.directory}/.cache-sqip/`)
 
   await ensureDir(cacheDir)
 
