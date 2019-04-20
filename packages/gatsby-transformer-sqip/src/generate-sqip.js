@@ -36,23 +36,19 @@ module.exports = async function generateSqip(options) {
   const cacheKey = `sqip-${name}-${optionsHash}`
   const cachePath = resolve(cacheDir, `${name}-${optionsHash}.svg`)
 
+  debug(`Request preview generation for ${name}-${optionsHash}`)
+
   return queue.add(async () => {
     let primitiveData = await cache.get(cacheKey)
 
-    debug(
-      `Adding preview generation request to queue for ${name}-${optionsHash}`,
-      {
-        sqipOptions,
-        hasCache: !!primitiveData,
-      }
-    )
+    debug(`Executing preview generation request for ${name}-${optionsHash}`)
 
     if (!primitiveData) {
       let svg
-      debug("Checking for path: " + cachePath)
+
       if (await exists(cachePath)) {
         debug(
-          `Primitive result file already exists of ${name}-${optionsHash} (${cachePath})`
+          `Primitive result file already exists for ${name}-${optionsHash} (${cachePath})`
         )
         const svgBuffer = await readFile(cachePath)
         svg = svgBuffer.toString()
@@ -74,7 +70,7 @@ module.exports = async function generateSqip(options) {
         svg = result.final_svg
 
         await writeFile(cachePath, svg)
-        debug(`Wrote primitive result file to disk of ${name}-${optionsHash}`)
+        debug(`Wrote primitive result file to disk for ${name}-${optionsHash}`)
       }
 
       primitiveData = {
@@ -83,6 +79,8 @@ module.exports = async function generateSqip(options) {
       }
 
       await cache.set(cacheKey, primitiveData)
+    } else {
+      debug(`Cache found for ${name}-${optionsHash}`)
     }
 
     return primitiveData
