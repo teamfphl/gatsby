@@ -20,7 +20,9 @@
 
 ## Disclaimer
 
-This project can create beautiful results, but this comes with the cost of processing power. It may take several seconds on your machine to generate the preview. **Make sure to invest some time and to cache your `public` folder to avoid regeneration of the previews on every build.**
+This project can create beautiful results, but this comes with the cost of processing power.
+It may take several seconds on your machine to generate the preview.
+**Make sure to invest initial generation time and cache your `public` & `.cache-sqip` folders to avoid regeneration of the previews on every build.**
 
 Netlify users might use [gatsby-plugin-netlify-cache](https://github.com/axe312ger/gatsby-plugin-netlify-cache).
 
@@ -137,12 +139,21 @@ See: https://www.contentful.com/developers/docs/references/images-api/#/referenc
 
 ### Displaying the previews
 
-#### Pure JSX
+#### Pure JSX/HTML
+
+Does not use client-side js at all.
+
+Lazy loading can be achieved here using the new `loading` html attribute [coming with Chrome 75 on 4. of June 2019.](https://addyosmani.com/blog/lazy-loading/)
 
 ```jsx
 <div className="image-wrapper">
   <img src={image.sqip.dataURI} alt="" role="presentation" />
-  <img src={image.src} alt="Useful description" className="image" />
+  <img
+    loading="auto"
+    src={image.src}
+    alt="Useful description"
+    className="image"
+  />
 </div>
 ```
 
@@ -173,7 +184,8 @@ See: https://www.contentful.com/developers/docs/references/images-api/#/referenc
 
 **Cons:**
 
-- All images are loaded, no matter if they are in the viewport or not
+- All images are loaded, no matter if they are in the viewport or not.
+(Except the users browser supports the [new `loading` attribute](linkme).)
 
 #### Gatsby Image
 
