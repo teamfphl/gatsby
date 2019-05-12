@@ -193,13 +193,40 @@ function prepareTextNode(node, key, text, createNodeId) {
   return textNode
 }
 
-function prepareRichTextNode(node, key, content, createNodeId) {
+function replaceContentTargets(document, children = [], nodeOptions) {
+  document.content.forEach(entry => {
+    if(entry.data && entry.data.target && entry.data.target.sys && entry.data.target.sys.id) {
+      const id = replaceEntryByResolvable(entry.data, entry.data.target, "target", nodeOptions);
+      if(id) {
+        children.push(id);
+      }
+    };
+
+    if(entry.content) {
+      replaceContentTargets(entry, children, nodeOptions);
+    }
+  });
+}
+
+function replaceEntryByResolvable(data, target, key, {resolvable, mId}) {
+  let id;
+  if (resolvable.has(target.sys.id)) {
+    id = mId(target.sys.id);
+    data[`${key}___NODE`] = id;
+  }
+  delete data[key];
+  return id;
+}
+
+function prepareRichTextNode(node, key, content, createNodeId, nodeOptions) {
   const str = stringify(content)
+  const children = [];
+  replaceContentTargets(content, children, nodeOptions);
   const richTextNode = {
     ...content,
     id: createNodeId(`${node.id}${key}RichTextNode`),
     parent: node.id,
-    children: [],
+    children: children,
     [key]: str,
     internal: {
       type: _.camelCase(`${node.internal.type} ${key} RichTextNode`),
